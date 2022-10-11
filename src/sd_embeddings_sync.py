@@ -18,14 +18,12 @@
 
 from pydantic import BaseModel
 from enum import Enum
-from os import DirEntry, remove
-import re
+from os import remove
 import sys
 import requests
 from requests import get
 import os.path
 import json
-import time
 from bs4 import BeautifulSoup
 from picklescan.scanner import scan_huggingface_model
 import pyclamd
@@ -167,31 +165,31 @@ class RepoFileManager:
         # Check make sure URL accessable.
         self.repo_file.url = self.get_url()
         self.repo_file.is_accessable = self.url_exists()
-        if self.repo_file.is_accessable == False:
+        if self.repo_file.is_accessable is False:
             return False
         # Check file does not exist.
         self.repo_file.needs_downloaded = not self.file_exists()
         # Check file size is empty.
-        if self.repo_file.needs_downloaded == False:
+        if self.repo_file.needs_downloaded is False:
             self.repo_file.file_size = os.path.getsize(self.repo_file.file_name)
             self.repo_file.is_non_empty = self.repo_file.file_size != 0
-            if self.repo_file.is_non_empty == False:
+            if self.repo_file.is_non_empty is False:
                 self.repo_file.needs_downloaded = True
         # Check sha256 and md5 checksum don't match entry
-        if self.repo_file.needs_downloaded == False:
+        if self.repo_file.needs_downloaded is False:
             self.repo_file.needs_downloaded = (
                 not self.repo_file.md5_checksum == hashlib.md5(open(self.repo_file.file_name, "rb").read()).hexdigest()
                 or not self.repo_file.sha256_checksum == hashlib.sha256(open(self.repo_file.file_name, "rb").read()).hexdigest()
             )
         # Check no pickle infections
-        if self.repo_file.needs_downloaded == False:
+        if self.repo_file.needs_downloaded is False:
             self.is_pickle_clean = scan_huggingface_model(self.repo_file.repo_id).infected_files == 0
             if not self.is_pickle_clean:
                 remove(self.repo_file.file_name)
                 return False
         # Download the file if need to
-        if self.repo_file.needs_downloaded == True:
-            if self.file_exists() == True:
+        if self.repo_file.needs_downloaded is True:
+            if self.file_exists() is True:
                 remove(self.repo_file.file_name)
             with open(self.repo_file.file_name, "wb") as file:
                 response = get(self.repo_file.url)
@@ -222,7 +220,8 @@ class RepoFileManager:
         if self.repo_file.file_type == RepoFileType.HFEMBEDDING:
             return f"https://huggingface.co/{self.repo_file.repo_id}/resolve/main/learned_embeds.bin"
         if self.repo_file.file_type == RepoFileType.HFIMAGE:
-            return f"https://huggingface.co/{self.repo_file.repo_id}/resolve/main/concept_images/{n}.jpeg"
+            n = os.path.basename(str(self.repo_file.file_name))
+            return f"https://huggingface.co/{self.repo_file.repo_id}/resolve/main/concept_images/{n}"
 
 
 class RepoManager:
@@ -233,7 +232,7 @@ class RepoManager:
         self.repo_status = RepoStatus()
 
     def load_concepts_library(self):
-        print(f"Loading latest embedding repository list")
+        print("Loading latest embedding repository list")
         sys.stdout.flush()
         page = requests.get(self.settings_manager.settings.concepts_library_url)
         soup = BeautifulSoup(page.content, "html.parser")
@@ -245,7 +244,7 @@ class RepoManager:
         repo_count = len(soup_repos)
         repo_suffix = "" if repo_count == 1 else "s"
         print(f"Found {repo_count} repo{repo_suffix}")
-        print(f"")
+        print("")
         sys.stdout.flush()
         for item in soup_repos:
             if (not self.settings_manager.in_allow(item)) and (not self.settings_manager.in_deny(item)):
