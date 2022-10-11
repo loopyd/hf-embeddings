@@ -25,7 +25,7 @@ jobs:
       - name: Lint with flake8
         run: python -m flake8 . --count --show-source --statistics
       - name: Test with pytest
-        run: python -m pytest tests --cov=sd-embeddings-sync --doctest-modules --junitxml=junit/test-results.xml --cov-report=xml --cov-report=html
+        run: python -m pytest tests --cov=sdembeddingssync --doctest-modules --junitxml=junit/test-results.xml --cov-report=xml --cov-report=html
       - name: Archive test results
         uses: actions/upload-artifact@v3
         with:
