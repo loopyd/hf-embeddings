@@ -32,13 +32,16 @@ import pyclamd
 import hashlib
 from typing import List
 
+
 class RepoFileType(Enum):
     HFEMBEDDING = 1
     HFIMAGE = 2
 
+
 class RepoState(Enum):
     ALLOW = 1
     DENY = 2
+
 
 class RepoFile(BaseModel):
     repo_id: str = ""
@@ -53,6 +56,7 @@ class RepoFile(BaseModel):
     is_non_empty: bool = False
     needs_downloaded: bool = True
 
+
 class RepoStatus:
     def __init__(self):
         self.skipped_repos: int = 0
@@ -66,38 +70,40 @@ class RepoStatus:
     def print_status(self):
         std_out = ""
         if self.downloaded_repos > 0:
-            suffix=("" if self.downloaded_repos == 1 else "s")
+            suffix = "" if self.downloaded_repos == 1 else "s"
             std_out += f"Downloaded {self.downloaded_repos} repo{suffix}\n\r"
         if self.already_downloaded_repos > 0:
-            suffix=("" if self.already_downloaded_repos == 1 else "s")
+            suffix = "" if self.already_downloaded_repos == 1 else "s"
             std_out += f"Already downloaded {self.already_downloaded_repos} repo{suffix}\n\r"
         if self.skipped_repos > 0:
-            suffix=("" if self.skipped_repos == 1 else "s")
+            suffix = "" if self.skipped_repos == 1 else "s"
             std_out += f"Skipped {self.skipped_repos} repo{suffix}\n\r"
         if self.downloaded_images > 0:
-            suffix=("" if self.downloaded_images == 1 else "s")
+            suffix = "" if self.downloaded_images == 1 else "s"
             std_out += f"Downloaded {self.downloaded_images} image{suffix}\n\r"
         if self.already_downloaded_images > 0:
-            suffix=("" if self.already_downloaded_images == 1 else "s")
+            suffix = "" if self.already_downloaded_images == 1 else "s"
             std_out += f"Already downloaded {self.already_downloaded_images} image{suffix}\n\r"
         if self.failed_repos > 0:
-            suffix=("" if self.failed_repos == 1 else "s")
+            suffix = "" if self.failed_repos == 1 else "s"
             print(f"{self.failed_repos} repo{suffix} failed.")
         if self.failed_images > 0:
-            suffix=("" if self.failed_images == 1 else "s")
+            suffix = "" if self.failed_images == 1 else "s"
             print(f"{self.failed_images} image{suffix} failed.")
         print("")
         print("Done.")
 
+
 class Settings(BaseModel):
-    concepts_library_url:str ='https://huggingface.co/sd-concepts-library'
+    concepts_library_url: str = "https://huggingface.co/sd-concepts-library"
     embedding_config_file: str = "./embeddings/embeddings.json"
-    embeddings_dir:str ='./embeddings/'
-    embeddings_samples_dir:str ='./embeddings/embeddings_samples/'
+    embeddings_dir: str = "./embeddings/"
+    embeddings_samples_dir: str = "./embeddings/embeddings_samples/"
     allow_list: List[RepoFile] = List[RepoFile]
     deny_list: List[RepoFile] = List[RepoFile]
     download_images: bool = False
     max_images: int = 4
+
 
 class SettingsManager:
     def init(self):
@@ -152,6 +158,7 @@ class SettingsManager:
         self.settings.deny_list.remove(deny)
         self.repo_file_managers = List([item for item in self.repo_file_managers if not item.repo_file != deny])
 
+
 class RepoFileManager:
     def __init__(self, repo_file):
         self.repo_file = repo_file
@@ -167,15 +174,18 @@ class RepoFileManager:
         # Check file size is empty.
         if self.repo_file.needs_downloaded == False:
             self.repo_file.file_size = os.path.getsize(self.repo_file.file_name)
-            self.repo_file.is_non_empty = (self.repo_file.file_size != 0)
+            self.repo_file.is_non_empty = self.repo_file.file_size != 0
             if self.repo_file.is_non_empty == False:
                 self.repo_file.needs_downloaded = True
         # Check sha256 and md5 checksum don't match entry
         if self.repo_file.needs_downloaded == False:
-            self.repo_file.needs_downloaded = ( not self.repo_file.md5_checksum == hashlib.md5(open(self.repo_file.file_name,'rb').read()).hexdigest() or not self.repo_file.sha256_checksum == hashlib.sha256(open(self.repo_file.file_name,'rb').read()).hexdigest() )
+            self.repo_file.needs_downloaded = (
+                not self.repo_file.md5_checksum == hashlib.md5(open(self.repo_file.file_name, "rb").read()).hexdigest()
+                or not self.repo_file.sha256_checksum == hashlib.sha256(open(self.repo_file.file_name, "rb").read()).hexdigest()
+            )
         # Check no pickle infections
         if self.repo_file.needs_downloaded == False:
-            self.is_pickle_clean = (scan_huggingface_model(self.repo_file.repo_id).infected_files == 0)
+            self.is_pickle_clean = scan_huggingface_model(self.repo_file.repo_id).infected_files == 0
             if not self.is_pickle_clean:
                 remove(self.repo_file.file_name)
                 return False
@@ -190,13 +200,13 @@ class RepoFileManager:
         if not self.repo_file.file_exists():
             return False
         # Ensure no pickle malware
-        self.repo_file.is_pickle_clean = (scan_huggingface_model(self.repo_file.repo_id).infected_files == 0)
+        self.repo_file.is_pickle_clean = scan_huggingface_model(self.repo_file.repo_id).infected_files == 0
         if not self.repo_file.is_pickle_clean:
             remove(self.repo_file.file_name)
             return False
         # Ensure checksum data
-        self.repo_file.md5_checksum = hashlib.md5(open(self.repo_file.file_name,'rb').read()).hexdigest()
-        self.repo_file.sha256_checksum = hashlib.sha256(open(self.repo_file.file_name,'rb').read()).hexdigest()
+        self.repo_file.md5_checksum = hashlib.md5(open(self.repo_file.file_name, "rb").read()).hexdigest()
+        self.repo_file.sha256_checksum = hashlib.sha256(open(self.repo_file.file_name, "rb").read()).hexdigest()
 
     def url_exists(self):
         response = get(self.repo_file.url)
@@ -206,13 +216,14 @@ class RepoFileManager:
             return False
 
     def file_exists(self):
-        return os.path.isfile(self.repo_file.file_name) 
-    
+        return os.path.isfile(self.repo_file.file_name)
+
     def get_url(self):
         if self.repo_file.file_type == RepoFileType.HFEMBEDDING:
             return f"https://huggingface.co/{self.repo_file.repo_id}/resolve/main/learned_embeds.bin"
         if self.repo_file.file_type == RepoFileType.HFIMAGE:
             return f"https://huggingface.co/{self.repo_file.repo_id}/resolve/main/concept_images/{n}.jpeg"
+
 
 class RepoManager:
     def __init__(self):
@@ -220,7 +231,7 @@ class RepoManager:
         self.settings_manager.init()
         self.settings_manager.load()
         self.repo_status = RepoStatus()
-    
+
     def load_concepts_library(self):
         print(f"Loading latest embedding repository list")
         sys.stdout.flush()
@@ -228,11 +239,11 @@ class RepoManager:
         soup = BeautifulSoup(page.content, "html.parser")
         soup_models = soup.find(id="models")
         soup_parent = soup_models.parent
-        soup_data = soup_parent['data-props']
+        soup_data = soup_parent["data-props"]
         soup_data_json = json.loads(soup_data)
-        soup_repos=soup_data_json["repos"]
-        repo_count=len(soup_repos)
-        repo_suffix=("" if repo_count == 1 else "s")
+        soup_repos = soup_data_json["repos"]
+        repo_count = len(soup_repos)
+        repo_suffix = "" if repo_count == 1 else "s"
         print(f"Found {repo_count} repo{repo_suffix}")
         print(f"")
         sys.stdout.flush()
@@ -257,6 +268,5 @@ class RepoManager:
         self.load_concepts_library()
         for repo in self.settings_manager.settings.allow_list:
             print(f"Processing {repo.repo_id}...")
-        
-        self.settings_manager.save()
 
+        self.settings_manager.save()

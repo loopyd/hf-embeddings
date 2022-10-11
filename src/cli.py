@@ -3,39 +3,22 @@ import logging
 import os
 import sys
 
-_log = logging.getLogger("sd_embeddings_sync")
+_log = logging.getLogger("sd-embeddings-sync")
+
 
 def main():
     _log.setLevel(logging.INFO)
     _log.addHandler(logging.StreamHandler(stream=sys.stdout))
 
     parser = argparse.ArgumentParser(
-        prog="sd-embeddings-sync-cli",
-        description="Fetch and sync stable-diffusion embeddings in the draconic way.",
-        add_help=True
+        prog="sd-embeddings-sync-cli", description="Fetch and sync stable-diffusion embeddings in the draconic way.", add_help=True
     )
     group = parser.add_mutually_exclusive_group()
-    group.add_argument(
-        "-p", "--embeddingspath", help="Set the embedding folder path", dest="embeddings_path"
-    )
-    group.add_argument(
-        "-i", "--imgpath", help="Set the embedding image folder path", dest="img_path"
-    )
-    group.add_argument(
-        "-j", "--jsonpath", help="Set the location to store the repository database", dest="json_path"
-    )
-    group.add_argument(
-        "-nh",
-        "--nohuggingface",
-        help="Disable sync for huggingface",
-        dest="no_hf",
-        action="store_false"
-    )
-    parser.set_defaults(
-        no_hf=False,
-        embeddings_path="./embeddings",
-        json_path="./embeddings.json",
-        img_path="./embeddings/images")
+    group.add_argument("-p", "--embeddingspath", help="Set the embedding folder path", dest="embeddings_path")
+    group.add_argument("-i", "--imgpath", help="Set the embedding image folder path", dest="img_path")
+    group.add_argument("-j", "--jsonpath", help="Set the location to store the repository database", dest="json_path")
+    group.add_argument("-nh", "--nohuggingface", help="Disable sync for huggingface", dest="no_hf", action="store_false")
+    parser.set_defaults(no_hf=False, embeddings_path="./embeddings", json_path="./embeddings.json", img_path="./embeddings/images")
     parser.add_argument(
         "-l",
         "--log",
@@ -58,7 +41,7 @@ def main():
             else:
                 raise ValueError(f"Path: {args.img_path} is not a directory")
         if args.json_path != "./embeddings.json":
-            if os.path.exists(args.json_path) and os.path.isfile(args.json_path) and str(args.json_path).endswith('.json'):
+            if os.path.exists(args.json_path) and os.path.isfile(args.json_path) and str(args.json_path).endswith(".json"):
                 print("Stubbed for now")
             else:
                 raise ValueError(f"Path: {args.json_path} is not a valid JSON file")
@@ -66,6 +49,7 @@ def main():
     except Exception:
         _log.exception("Unhandled exception")
         return 2
+
 
 if __name__ == "__main__":
     sys.exit(main())
