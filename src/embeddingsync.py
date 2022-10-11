@@ -16,6 +16,7 @@
 # <> are not required but can be used (and may give better results)
 ###
 
+import logging
 from pydantic import BaseModel
 from enum import Enum
 from os import remove
@@ -29,6 +30,8 @@ from picklescan.scanner import scan_huggingface_model
 import pyclamd
 import hashlib
 from typing import List
+
+_log = logging.getLogger("sd-embeddings-sync")
 
 
 class RepoFileType(Enum):
