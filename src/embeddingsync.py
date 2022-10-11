@@ -31,7 +31,7 @@ import pyclamd
 import hashlib
 from typing import List
 
-_log = logging.getLogger("sd_embeddings_sync")
+_log = logging.getLogger("sd-embeddings-sync")
 
 
 class RepoFileType(Enum):
