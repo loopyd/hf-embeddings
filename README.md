@@ -1,4 +1,4 @@
-# HuggingFace-Embeddings
+# sd-embeddings-sync
 
 Package manager for huggingface embeddings, designed for [AUTOMATIC1111](https://github.com/AUTOMATIC1111/stable-diffusion-webuiv)'s repository.
 
@@ -16,7 +16,15 @@ Package manager for huggingface embeddings, designed for [AUTOMATIC1111](https:/
 
 ### 0.3a - DeityDurg's unfinished release
 
-- Starting with this Github repository with formal documentation applied and software license, this is DeityDurg's maintained version of the script.  Changes from here will be moving forward.
+- Starting with this Github repository with:
+  - formal documentation applied
+  - software license
+  - as pip module
+  - include unit tests
+  - managed by GitHub workflows
+- this is DeityDurg's dragonified / maintained pip module version of the script.  Changes from here will be moving forward.
+
+- You can't install this yet as its unfinished.  Coming soon(tm)
 
 -------------------
 

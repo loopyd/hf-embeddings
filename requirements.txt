@@ -1,0 +1,6 @@
+pydantic
+pyclamd
+beautifulsoup4
+requests
+aiohttp
+typing
