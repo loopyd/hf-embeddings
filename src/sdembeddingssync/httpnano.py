@@ -18,9 +18,7 @@ def http_get(url: str, header_only: bool = False, fail_on_error: bool = True):
     _log.debug(f"Request: GET {url}")
 
     parsed_url = urllib.parse.urlparse(url)
-    path_and_query = parsed_url.path + (
-        "?" + parsed_url.query if len(parsed_url.query) > 0 else ""
-    )
+    path_and_query = parsed_url.path + ("?" + parsed_url.query if len(parsed_url.query) > 0 else "")
 
     conn = http.client.HTTPSConnection(parsed_url.netloc)
     try:
@@ -36,17 +34,8 @@ def http_get(url: str, header_only: bool = False, fail_on_error: bool = True):
             else:
                 _log.error(message)
         if header_only is False:
-            return HTTPResponse(
-                status=response.status,
-                reason=response.reason,
-                headers=response.headers,
-                content=response.read()
-            )
+            return HTTPResponse(status=response.status, reason=response.reason, headers=response.headers, content=response.read())
         else:
-            return HTTPResponse(
-                status=response.status,
-                reason=response.reason,
-                headers=response.headers
-            )
+            return HTTPResponse(status=response.status, reason=response.reason, headers=response.headers)
     finally:
         conn.close()

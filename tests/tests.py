@@ -3,12 +3,7 @@ import importlib
 import sys
 import pytest
 from sdembeddingssync.cli import main
-from sdembeddingssync.sdsync import (
-    RepoStatus,
-    SettingsManager,
-    RepoFileManager,
-    RepoManager
-)
+from sdembeddingssync.sdsync import RepoStatus, SettingsManager, RepoFileManager, RepoManager
 from sdembeddingssync.httpnano import http_get
 
 
