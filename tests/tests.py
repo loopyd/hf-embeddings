@@ -1,4 +1,6 @@
 import http.client
+import importlib
+import sys
 import pytest
 from sdembeddingssync.cli import main
 from sdembeddingssync.sdsync import (
@@ -97,3 +99,23 @@ def test_RepoManager_instanced():
 
 def test_RepoStatus_instanced():
     assert RepoStatus() is not None
+
+
+def test_main_helpScreen():
+    argv = sys.argv
+    try:
+        sys.argv = ["sdembeddingsync", "--help"]
+        assert main() == 0
+        importlib.import_module("picklescan.__main__")
+    finally:
+        sys.argv = argv
+
+
+def test_main_defaultArgs():
+    argv = sys.argv
+    try:
+        sys.argv = ["sdembeddingsync"]
+        assert main() == 0
+        importlib.import_module("picklescan.__main__")
+    finally:
+        sys.argv = argv
