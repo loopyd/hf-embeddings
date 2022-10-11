@@ -4,3 +4,9 @@ beautifulsoup4
 requests
 aiohttp
 typing
+twine
+flake8
+pytest
+pytest-cov
+black
+
