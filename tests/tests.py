@@ -1,15 +1,5 @@
-import aiohttp
-import http.client
 import importlib
-import io
-import os
-import pytest
-import requests
-import socket
-import subprocess
-import sys
 from unittest import TestCase
-import zipfile
 
 
 def TestSettingsManagerInstance_test():
