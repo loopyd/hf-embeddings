@@ -1,28 +1,11 @@
 #!/bin/python
 
-####
-# Designed for use with https://github.com/AUTOMATIC1111/stable-diffusion-webui
-# Run this file from the root of the repo
-#
-# Updated by saber7ooth#7527 for more download reliability and filesystem
-# auto-correction, as well as read from embeddings-config.json on run.  You
-# can now configure pre-run or keep tabs daily as the json file is updated
-# correctly based upon the state of the huggingface repo.
-#
-# Usage in prompt: Put embedding name in prompt (using moxxi.pt and borderlands.pt)
-# e.g. moxxi on a beach, in the style of borderlands sharp, clear lines, detailed
-# or
-# e.g. <moxxi> on a beach, in the style of <borderlands> sharp, clear lines, detailed
-# <> are not required but can be used (and may give better results)
-###
-
 import logging
 from pydantic import BaseModel
 from enum import Enum
 from os import remove
 import sys
-import requests
-from requests import get
+from .httpnano import http_get
 import os.path
 import json
 from bs4 import BeautifulSoup
@@ -31,7 +14,7 @@ import pyclamd
 import hashlib
 from typing import List
 
-_log = logging.getLogger("sd-embeddings-sync")
+_log = logging.getLogger("sdembeddingssync")
 
 
 class RepoFileType(Enum):
@@ -195,7 +178,7 @@ class RepoFileManager:
             if self.file_exists() is True:
                 remove(self.repo_file.file_name)
             with open(self.repo_file.file_name, "wb") as file:
-                response = get(self.repo_file.url)
+                response = http_get(self.repo_file.url, header_only=False, fail_on_error=True)
                 file.write(response.content)
         # Ensure file exists
         if not self.repo_file.file_exists():
@@ -210,8 +193,8 @@ class RepoFileManager:
         self.repo_file.sha256_checksum = hashlib.sha256(open(self.repo_file.file_name, "rb").read()).hexdigest()
 
     def url_exists(self):
-        response = get(self.repo_file.url)
-        if response.status_code == 200:
+        response = http_get(self.repo_file.url, header_only=True, fail_on_error=False)
+        if response.status == 200:
             return True
         else:
             return False
@@ -237,7 +220,7 @@ class RepoManager:
     def load_concepts_library(self):
         print("Loading latest embedding repository list")
         sys.stdout.flush()
-        page = requests.get(self.settings_manager.settings.concepts_library_url)
+        page = http_get(self.settings_manager.settings.concepts_library_url, header_only=False, fail_on_error=True)
         soup = BeautifulSoup(page.content, "html.parser")
         soup_models = soup.find(id="models")
         soup_parent = soup_models.parent

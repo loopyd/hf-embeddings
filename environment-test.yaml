@@ -1,4 +1,4 @@
-name: sd-embeddings-sync-test
+name: sdembeddingssync-test
 channels:
 - nodefaults
 dependencies:

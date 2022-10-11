@@ -1,4 +1,4 @@
-name: sd-embeddings-sync
+name: sdembeddingssync
 channels:
 - nodefaults
 dependencies:

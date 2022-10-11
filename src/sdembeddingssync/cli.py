@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 
-_log = logging.getLogger("sd-embeddings-sync")
+_log = logging.getLogger("sdembeddingssync")
 
 
 def main():
